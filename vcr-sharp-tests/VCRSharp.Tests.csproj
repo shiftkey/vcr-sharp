@@ -14,6 +14,9 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="fixtures\append-new-request.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="fixtures\example-test.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -56,6 +56,27 @@ namespace VcrSharp.Tests
             result.http_interactions.Length.ShouldBe(1);
         }
 
+        [Fact]
+        public async Task AppendsNewRequestToCache()
+        {
+            Environment.SetEnvironmentVariable("VCR_MODE", "Cache");
+            var session = "append-second-request";
+
+            using (var httpClient = HttpClientFactory.WithCassette(session))
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, "https://www.iana.org/performance/ietf-statistics");
+                var response = await httpClient.SendAsync(request);
+            }
+
+            var file = HttpClientFactory.GetFixturePath(session);
+            File.Exists(file).ShouldBe(true);
+            var text = await File.ReadAllTextAsync(file);
+            var result = JsonConvert.DeserializeObject<CachedRequestResponseArray>(text);
+
+            result.http_interactions.Length.ShouldBe(2);
+        }
+
+
         private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)

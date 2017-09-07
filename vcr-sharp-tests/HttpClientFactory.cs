@@ -12,7 +12,7 @@ namespace VcrSharp.Tests
             return Path.Combine(AssemblyLoadDirectory, "fixtures", session + ".json");
         }
 
-        public static string AssemblyLoadDirectory
+        static string AssemblyLoadDirectory
         {
             get
             {
