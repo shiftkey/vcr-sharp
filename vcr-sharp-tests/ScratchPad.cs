@@ -11,10 +11,10 @@ namespace VcrSharp.Tests
         [Fact]
         public async Task UseTheLocalFixtureToRetrieveTheResponse()
         {
+            Environment.SetEnvironmentVariable("VCR_MODE", "playback");
+
             using (var httpClient = HttpClientFactory.WithCassette("example-test"))
             {
-                Environment.SetEnvironmentVariable("VCR_MODE", "playback");
-
                 var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "http://www.iana.org/domains/reserved"));
                 var body = await response.Content.ReadAsStringAsync();
                 body.ShouldContain("Example domains");
@@ -24,10 +24,10 @@ namespace VcrSharp.Tests
         [Fact]
         public async Task ErrorsWhenTheRequestIsNotInTheCache()
         {
+            Environment.SetEnvironmentVariable("VCR_MODE", "playback");
+
             using (var httpClient = HttpClientFactory.WithCassette("no-cache-defined"))
             {
-                Environment.SetEnvironmentVariable("VCR_MODE", "playback");
-
                 await Assert.ThrowsAsync<PlaybackException>(() => httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "http://www.iana.org/domains/reserved")));
             }
         }
