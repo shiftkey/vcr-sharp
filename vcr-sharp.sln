@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vcr-sharp-tests", "vcr-sharp-tests\vcr-sharp-tests.csproj", "{3D505D30-B2A1-438F-B8E2-347C3A7BE440}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VCRSharp.Tests", "vcr-sharp-tests\VCRSharp.Tests.csproj", "{3D505D30-B2A1-438F-B8E2-347C3A7BE440}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

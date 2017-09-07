@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace VcrSharp.Tests
 {
-public class ReplayingHandler : DelegatingHandler
+    public class ReplayingHandler : DelegatingHandler
 {
     private readonly Cassette cassette;
 
