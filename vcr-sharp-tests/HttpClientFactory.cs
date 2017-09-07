@@ -7,7 +7,12 @@ namespace VcrSharp.Tests
 {
     public class HttpClientFactory
     {
-        static string AssemblyLoadDirectory
+        public static string GetFixturePath(string session)
+        {
+            return Path.Combine(AssemblyLoadDirectory, "fixtures", session + ".json");
+        }
+
+        public static string AssemblyLoadDirectory
         {
             get
             {
@@ -21,7 +26,7 @@ namespace VcrSharp.Tests
         public static HttpClient WithCassette(string session)
         {
             var currentDirectory = Assembly.GetExecutingAssembly();
-            var testCassettePath = Path.Combine(AssemblyLoadDirectory, "fixtures", session + ".json");
+            var testCassettePath = GetFixturePath(session);
             var handler = new ReplayingHandler(testCassettePath);
             var httpClient = new HttpClient(handler);
             return httpClient;

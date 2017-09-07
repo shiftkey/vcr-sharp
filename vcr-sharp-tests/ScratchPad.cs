@@ -1,5 +1,6 @@
 using Shouldly;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
@@ -32,6 +33,23 @@ namespace VcrSharp.Tests
                 var request = new HttpRequestMessage(HttpMethod.Get, "http://www.iana.org/domains/reserved");
                 await Assert.ThrowsAsync<PlaybackException>(() => httpClient.SendAsync(request));
             }
+        }
+
+
+        [Fact]
+        public async Task WritesAndFlushesAResponseToDisk()
+        {
+            Environment.SetEnvironmentVariable("VCR_MODE", "Record");
+            var session = "create-local-file";
+
+            using (var httpClient = HttpClientFactory.WithCassette(session))
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, "http://www.iana.org/domains/reserved");
+                var response = await httpClient.SendAsync(request);
+            }
+
+            var file = HttpClientFactory.GetFixturePath(session);
+            File.Exists(file).ShouldBe(true);
         }
 
         private bool disposedValue = false;

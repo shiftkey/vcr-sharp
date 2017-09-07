@@ -81,10 +81,19 @@ namespace VcrSharp.Tests
                 var output = Encoding.UTF8.GetString(decodedBytes);
                 return new StringContent(output);
             }
+
+            if (body.Encoding == "UTF8-8BIT")
+            {
+                var text = body.Base64_string;
+                var decodedBytes = Convert.FromBase64String(text);
+                var output = Encoding.UTF8.GetString(decodedBytes);
+                return new StringContent(output);
+            }
+
             return null;
         }
 
-        internal async Task<CacheResult> findCachedResponseAsync(HttpRequestMessage request)
+        internal async Task<CacheResult> FindCachedResponseAsync(HttpRequestMessage request)
         {
             if (cache == null)
             {
@@ -100,16 +109,61 @@ namespace VcrSharp.Tests
             return CacheResult.Missing();
         }
 
-        internal Task storeCachedResponseAsync(HttpRequestMessage request, HttpResponseMessage freshResponse)
+        internal async Task StoreCachedResponseAsync(HttpRequestMessage request, HttpResponseMessage freshResponse)
         {
-            // TODO: implement this
-            return Task.FromResult(0);
+            var cachedResponse = new CachedRequestResponse
+            {
+                Request = new CachedRequest
+                {
+                    Headers = request.Headers.ToDictionary(h => h.Key, h => h.Value.ToArray()),
+                    Method = request.Method.Method,
+                    Uri = request.RequestUri,
+                    Body = await ParseContent(request.Content)
+                },
+                Response = new CachedResponse
+                {
+                    Headers = freshResponse.Headers.ToDictionary(h => h.Key, h => h.Value.ToArray()),
+                    Status = new Status
+                    {
+                        Code = (int)freshResponse.StatusCode,
+                        Message = freshResponse.StatusCode.ToString()
+                    },
+                    Body = await ParseContent(freshResponse.Content)
+                }
+            };
+
+            cache.Add(cachedResponse);
+        }
+
+        private async Task<Body> ParseContent(HttpContent content)
+        {
+            if (content == null)
+            {
+                return new Body
+                {
+                    Encoding = "",
+                    Base64_string = ""
+                };
+            }
+
+            var text = await content.ReadAsStringAsync();
+            var bytes = Encoding.UTF8.GetBytes(text);
+            return new Body
+            {
+                Base64_string = Convert.ToBase64String(bytes),
+                Encoding = "UTF8-8BIT"
+            };
         }
 
         internal Task FlushToDisk()
         {
-            // TODO: implement this
-            return Task.FromResult(0);
+            var json = new CachedRequestResponseArray
+            {
+                http_interactions = cache
+            };
+
+            var text = JsonConvert.SerializeObject(json);
+            return File.WriteAllTextAsync(cassettePath, text);
         }
     }
 
