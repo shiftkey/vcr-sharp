@@ -36,7 +36,6 @@ namespace VcrSharp.Tests
             }
         }
 
-
         [Fact]
         public async Task WritesAndFlushesAResponseToDisk()
         {
@@ -54,7 +53,7 @@ namespace VcrSharp.Tests
             var text = await File.ReadAllTextAsync(file);
             var result = JsonConvert.DeserializeObject<CachedRequestResponseArray>(text);
 
-            result.http_interactions.Count.ShouldBe(1);
+            result.http_interactions.Length.ShouldBe(1);
         }
 
         private bool disposedValue = false;

@@ -26,7 +26,8 @@ namespace VcrSharp.Tests
             {
                 var task = Task.Factory.StartNew(() => JsonConvert.DeserializeObject<CachedRequestResponseArray>(File.ReadAllText(cassettePath)));
                 var contents = await task;
-                cache = new List<CachedRequestResponse>(contents.http_interactions);
+                cache = new List<CachedRequestResponse>(contents.http_interactions ?? Array.Empty<CachedRequestResponse>());
+
             }
             else
             {
@@ -111,6 +112,11 @@ namespace VcrSharp.Tests
 
         internal async Task StoreCachedResponseAsync(HttpRequestMessage request, HttpResponseMessage freshResponse)
         {
+            if (cache == null)
+            {
+                await SetupCache();
+            }
+
             var cachedResponse = new CachedRequestResponse
             {
                 Request = new CachedRequest
@@ -159,7 +165,7 @@ namespace VcrSharp.Tests
         {
             var json = new CachedRequestResponseArray
             {
-                http_interactions = cache
+                http_interactions = cache.ToArray()
             };
 
             var text = JsonConvert.SerializeObject(json);
@@ -202,6 +208,6 @@ namespace VcrSharp.Tests
 
     internal class CachedRequestResponseArray
     {
-        public List<CachedRequestResponse> http_interactions { get; set; }
+        public CachedRequestResponse[] http_interactions { get; set; }
     }
 }
