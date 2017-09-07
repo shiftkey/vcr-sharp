@@ -49,10 +49,9 @@ While it's early days (and I'm not sure if this will even reach production usage
 a lot of prior art in here which I've used for research as part of starting this:
 
  - The contributors to the [`vcr`](https://github.com/vcr/vcr) gem
- - @philschatz for his work on [`fetch-vcr`](https://github.com/philschatz/fetch-vcr)
- - @mleech for his work on [`scotch`](https://github.com/mleech/scotch)
+ - [**@philschatz**](https://github.com/philschatz) for his work on [`fetch-vcr`](https://github.com/philschatz/fetch-vcr)
+ - [**@mleech**](https://github.com/mleech) for his work on [`scotch`](https://github.com/mleech/scotch)
 
 ## TODO
 
- - can we intercept `new HttpClient()` constructor setup via reflection and pass in our custom instance
  - probably a bunch of other things
