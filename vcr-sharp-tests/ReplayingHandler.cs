@@ -74,15 +74,9 @@ namespace VcrSharp.Tests
             var freshResponse = await base.SendAsync(request, cancellationToken);
 
             await cassette.StoreCachedResponseAsync(request, freshResponse);
+            await cassette.FlushToDisk();
 
             return freshResponse;
-        }
-
-        protected override async void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            await cassette.FlushToDisk();
         }
     }
 }

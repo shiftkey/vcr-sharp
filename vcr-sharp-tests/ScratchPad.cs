@@ -75,8 +75,7 @@ namespace VcrSharp.Tests
 
             result.http_interactions.Length.ShouldBe(2);
         }
-
-
+        
         private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
