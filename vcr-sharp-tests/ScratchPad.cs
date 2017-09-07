@@ -48,8 +48,8 @@ namespace VcrSharp.Tests
                 var response = await httpClient.SendAsync(request);
             }
 
-            var result = await ReadCassetteFile(session);
-            result.http_interactions.Length.ShouldBe(1);
+            var cassette = await ReadCassetteFile(session);
+            cassette.http_interactions.Length.ShouldBe(1);
         }
 
         [Fact]
@@ -64,8 +64,8 @@ namespace VcrSharp.Tests
                 var response = await httpClient.SendAsync(request);
             }
 
-            var result = await ReadCassetteFile(session);
-            result.http_interactions.Length.ShouldBe(2);
+            var cassette = await ReadCassetteFile(session);
+            cassette.http_interactions.Length.ShouldBe(2);
         }
         
         static async Task<CachedRequestResponseArray> ReadCassetteFile(string session)
@@ -73,8 +73,7 @@ namespace VcrSharp.Tests
             var file = HttpClientFactory.GetFixturePath(session);
             File.Exists(file).ShouldBe(true);
             var text = await File.ReadAllTextAsync(file);
-            var result = JsonConvert.DeserializeObject<CachedRequestResponseArray>(text);
-            return result;
+            return JsonConvert.DeserializeObject<CachedRequestResponseArray>(text);
         }
         
         private bool disposedValue = false;
