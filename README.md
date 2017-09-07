@@ -28,6 +28,21 @@ using (var httpClient = HttpClientFactory.WithCassette("my-test-scenario"))
 VCR supports a number of modes, which are specified by environment variables to
 simplify maintenance of tests:
 
+ - `playback` (default) - always use the cache, throw an error if not found in cache
+ - `cache` - try the cache, fallback to the network if not found and add the new response
+ - `record` - avoid the cache, always use the network and store the new response
+ 
+Simply set the `VCR_MODE` environment variable to whatever mode you want when running the tests.
+ 
+## Why not use `XYZ`?
+
+I evaluated `scotch` before and wanted to take it further but ended up starting clean for a
+couple of reasons:
+
+ - the use of F# - I wasn't in the mood to re-learn F#, I just wanted to get this idea out there
+ - putting the replay/recording state in the API isn't something I'm a fan of - I wanted to 
+   instead use environment variables so the tests remained simpler.
+
 ## Credits
 
 While it's early days (and I'm not sure if this will even reach production usage) there's already
