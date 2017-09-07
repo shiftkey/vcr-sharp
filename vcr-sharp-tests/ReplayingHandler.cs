@@ -58,10 +58,9 @@ namespace VcrSharp.Tests
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var cachedResponse = await cassette.findCachedResponseAsync(request);
-
-            if (cachedResponse.Item1)
+            if (cachedResponse.Found)
             {
-                return cachedResponse.Item2;
+                return cachedResponse.Response;
             }
 
             if (CurrentVCRMode == VCRMode.Playback)

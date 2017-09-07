@@ -9,6 +9,7 @@ using System.Text;
 
 namespace VcrSharp.Tests
 {
+
     public class Cassette
     {
         private readonly string cassettePath;
@@ -83,7 +84,7 @@ namespace VcrSharp.Tests
             return null;
         }
 
-        internal async Task<Tuple<bool, HttpResponseMessage>> findCachedResponseAsync(HttpRequestMessage request)
+        internal async Task<CacheResult> findCachedResponseAsync(HttpRequestMessage request)
         {
             if (cache == null)
             {
@@ -93,10 +94,10 @@ namespace VcrSharp.Tests
             var match = cache.FirstOrDefault(c => MatchesRequest(c, request));
             if (match != null)
             {
-                return Tuple.Create(true, FormatResponse(match.Response));
+                return CacheResult.Success(FormatResponse(match.Response));
             }
 
-            return Tuple.Create<bool, HttpResponseMessage>(false, null);
+            return CacheResult.Missing();
         }
 
         internal Task storeCachedResponseAsync(HttpRequestMessage request, HttpResponseMessage freshResponse)
