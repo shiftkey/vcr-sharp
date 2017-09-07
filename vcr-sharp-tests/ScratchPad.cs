@@ -48,11 +48,7 @@ namespace VcrSharp.Tests
                 var response = await httpClient.SendAsync(request);
             }
 
-            var file = HttpClientFactory.GetFixturePath(session);
-            File.Exists(file).ShouldBe(true);
-            var text = await File.ReadAllTextAsync(file);
-            var result = JsonConvert.DeserializeObject<CachedRequestResponseArray>(text);
-
+            var result = await ReadCassetteFile(session);
             result.http_interactions.Length.ShouldBe(1);
         }
 
@@ -68,16 +64,20 @@ namespace VcrSharp.Tests
                 var response = await httpClient.SendAsync(request);
             }
 
+            var result = await ReadCassetteFile(session);
+            result.http_interactions.Length.ShouldBe(2);
+        }
+        
+        static async Task<CachedRequestResponseArray> ReadCassetteFile(string session)
+        {
             var file = HttpClientFactory.GetFixturePath(session);
             File.Exists(file).ShouldBe(true);
             var text = await File.ReadAllTextAsync(file);
             var result = JsonConvert.DeserializeObject<CachedRequestResponseArray>(text);
-
-            result.http_interactions.Length.ShouldBe(2);
+            return result;
         }
         
         private bool disposedValue = false;
-
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
