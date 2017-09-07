@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Shouldly;
 using System;
 using System.IO;
@@ -50,6 +51,10 @@ namespace VcrSharp.Tests
 
             var file = HttpClientFactory.GetFixturePath(session);
             File.Exists(file).ShouldBe(true);
+            var text = await File.ReadAllTextAsync(file);
+            var result = JsonConvert.DeserializeObject<CachedRequestResponseArray>(text);
+
+            result.http_interactions.Count.ShouldBe(1);
         }
 
         private bool disposedValue = false;
