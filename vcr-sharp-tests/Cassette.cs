@@ -9,7 +9,6 @@ using System.Text;
 
 namespace VcrSharp.Tests
 {
-
     public class Cassette
     {
         private readonly string cassettePath;
@@ -27,7 +26,6 @@ namespace VcrSharp.Tests
                 var task = Task.Factory.StartNew(() => JsonConvert.DeserializeObject<CachedRequestResponseArray>(File.ReadAllText(cassettePath)));
                 var contents = await task;
                 cache = new List<CachedRequestResponse>(contents.http_interactions ?? Array.Empty<CachedRequestResponse>());
-
             }
             else
             {
