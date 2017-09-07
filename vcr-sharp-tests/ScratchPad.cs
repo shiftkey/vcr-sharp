@@ -15,7 +15,8 @@ namespace VcrSharp.Tests
 
             using (var httpClient = HttpClientFactory.WithCassette("example-test"))
             {
-                var response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "http://www.iana.org/domains/reserved"));
+                var request = new HttpRequestMessage(HttpMethod.Get, "http://www.iana.org/domains/reserved");
+                var response = await httpClient.SendAsync(request);
                 var body = await response.Content.ReadAsStringAsync();
                 body.ShouldContain("Example domains");
             }
@@ -28,7 +29,8 @@ namespace VcrSharp.Tests
 
             using (var httpClient = HttpClientFactory.WithCassette("no-cache-defined"))
             {
-                await Assert.ThrowsAsync<PlaybackException>(() => httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Get, "http://www.iana.org/domains/reserved")));
+                var request = new HttpRequestMessage(HttpMethod.Get, "http://www.iana.org/domains/reserved");
+                await Assert.ThrowsAsync<PlaybackException>(() => httpClient.SendAsync(request));
             }
         }
 
