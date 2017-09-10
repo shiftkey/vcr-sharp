@@ -88,7 +88,8 @@ namespace VcrSharp.Tests
                 Directory.CreateDirectory(directory);
             }
 
-            return File.WriteAllTextAsync(cassettePath, text);
+            File.WriteAllText(cassettePath, text);
+            return Task.CompletedTask;
         }
     }
 
