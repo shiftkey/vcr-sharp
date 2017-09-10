@@ -82,6 +82,12 @@ namespace VcrSharp.Tests
             };
 
             var text = JsonConvert.SerializeObject(json);
+            var directory = Path.GetDirectoryName(cassettePath);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
             return File.WriteAllTextAsync(cassettePath, text);
         }
     }
