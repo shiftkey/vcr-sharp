@@ -42,56 +42,6 @@ namespace VcrSharp.Tests
                 && cached.Request.Uri == uri;
         }
 
-        static bool IsValidHeader(string header)
-        {
-            if (header == "Content-Length"
-                || header == "Last-Modified"
-                || header == "Expires"
-                || header == "Content-Type")
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        static HttpResponseMessage FormatResponse(CachedResponse cached)
-        {
-            var statusCode = (System.Net.HttpStatusCode)cached.Status.Code;
-            var response = new HttpResponseMessage(statusCode);
-            foreach (var kvp in cached.Headers)
-            {
-                if (IsValidHeader(kvp.Key))
-                {
-                    response.Headers.Add(kvp.Key, kvp.Value);
-                }
-            }
-            response.Content = SetContent(cached.Body);
-            return response;
-        }
-
-        static HttpContent SetContent(Body body)
-        {
-            if (body.Encoding == "ASCII-8BIT")
-            {
-                var text = body.Base64_string;
-                var textWithoutNewLines = text.Replace("\n", "");
-                var decodedBytes = Convert.FromBase64String(textWithoutNewLines);
-                var output = Encoding.UTF8.GetString(decodedBytes);
-                return new StringContent(output);
-            }
-
-            if (body.Encoding == "UTF8-8BIT")
-            {
-                var text = body.Base64_string;
-                var decodedBytes = Convert.FromBase64String(text);
-                var output = Encoding.UTF8.GetString(decodedBytes);
-                return new StringContent(output);
-            }
-
-            return null;
-        }
-
         internal async Task<CacheResult> FindCachedResponseAsync(HttpRequestMessage request)
         {
             if (cache == null)
@@ -102,7 +52,7 @@ namespace VcrSharp.Tests
             var match = cache.FirstOrDefault(c => MatchesRequest(c, request));
             if (match != null)
             {
-                return CacheResult.Success(FormatResponse(match.Response));
+                return CacheResult.Success(Serializer.Deserialize(match.Response));
             }
 
             return CacheResult.Missing();
@@ -117,46 +67,11 @@ namespace VcrSharp.Tests
 
             var cachedResponse = new CachedRequestResponse
             {
-                Request = new CachedRequest
-                {
-                    Headers = request.Headers.ToDictionary(h => h.Key, h => h.Value.ToArray()),
-                    Method = request.Method.Method,
-                    Uri = request.RequestUri,
-                    Body = await ParseContent(request.Content)
-                },
-                Response = new CachedResponse
-                {
-                    Headers = freshResponse.Headers.ToDictionary(h => h.Key, h => h.Value.ToArray()),
-                    Status = new Status
-                    {
-                        Code = (int)freshResponse.StatusCode,
-                        Message = freshResponse.StatusCode.ToString()
-                    },
-                    Body = await ParseContent(freshResponse.Content)
-                }
+                Request = await Serializer.Serialize(request),
+                Response = await Serializer.Serialize(freshResponse)
             };
 
             cache.Add(cachedResponse);
-        }
-
-        private async Task<Body> ParseContent(HttpContent content)
-        {
-            if (content == null)
-            {
-                return new Body
-                {
-                    Encoding = "",
-                    Base64_string = ""
-                };
-            }
-
-            var text = await content.ReadAsStringAsync();
-            var bytes = Encoding.UTF8.GetBytes(text);
-            return new Body
-            {
-                Base64_string = Convert.ToBase64String(bytes),
-                Encoding = "UTF8-8BIT"
-            };
         }
 
         internal Task FlushToDisk()
