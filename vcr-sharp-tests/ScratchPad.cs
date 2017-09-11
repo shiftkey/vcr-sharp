@@ -49,7 +49,7 @@ namespace VcrSharp.Tests
             }
 
             var cassette = await ReadCassetteFile(session);
-            cassette.http_interactions.Length.ShouldBe(1);
+            cassette.HttpInteractions.Length.ShouldBe(1);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace VcrSharp.Tests
             var session = "overwrite-request";
 
             var cassette = await ReadCassetteFile(session);
-            cassette.http_interactions.Length.ShouldBe(1);
+            cassette.HttpInteractions.Length.ShouldBe(1);
 
             using (var httpClient = HttpClientFactory.WithCassette(session))
             {
@@ -68,7 +68,7 @@ namespace VcrSharp.Tests
             }
 
             cassette = await ReadCassetteFile(session);
-            cassette.http_interactions.Length.ShouldBe(1);
+            cassette.HttpInteractions.Length.ShouldBe(1);
         }
         
         static async Task<CachedRequestResponseArray> ReadCassetteFile(string session)

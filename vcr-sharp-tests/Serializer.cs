@@ -86,7 +86,7 @@ namespace VcrSharp.Tests
                 return new Body
                 {
                     Encoding = "",
-                    Base64_string = ""
+                    Base64String = ""
                 };
             }
 
@@ -94,7 +94,7 @@ namespace VcrSharp.Tests
             var bytes = Encoding.UTF8.GetBytes(text);
             return new Body
             {
-                Base64_string = Convert.ToBase64String(bytes),
+                Base64String = Convert.ToBase64String(bytes),
                 Encoding = "UTF8-8BIT"
             };
         }
@@ -103,7 +103,7 @@ namespace VcrSharp.Tests
         {
             if (body.Encoding == "ASCII-8BIT")
             {
-                var text = body.Base64_string;
+                var text = body.Base64String;
                 var textWithoutNewLines = text.Replace("\n", "");
                 var decodedBytes = Convert.FromBase64String(textWithoutNewLines);
                 var output = Encoding.UTF8.GetString(decodedBytes);
@@ -112,7 +112,7 @@ namespace VcrSharp.Tests
 
             if (body.Encoding == "UTF8-8BIT")
             {
-                var text = body.Base64_string;
+                var text = body.Base64String;
                 var decodedBytes = Convert.FromBase64String(text);
                 var output = Encoding.UTF8.GetString(decodedBytes);
                 return new StringContent(output, Encoding.UTF8, mediaType);
