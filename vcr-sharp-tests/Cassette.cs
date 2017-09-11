@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -11,8 +10,10 @@ namespace VcrSharp.Tests
 {
     public class Cassette
     {
+        private int currentIndex = 0;
         private readonly string cassettePath;
-        private List<CachedRequestResponse> cache;
+        private List<CachedRequestResponse> cachedEntries;
+        private List<CachedRequestResponse> storedEntries;
 
         public Cassette(string cassettePath)
         {
@@ -25,12 +26,14 @@ namespace VcrSharp.Tests
             {
                 var task = Task.Factory.StartNew(() => JsonConvert.DeserializeObject<CachedRequestResponseArray>(File.ReadAllText(cassettePath)));
                 var contents = await task;
-                cache = new List<CachedRequestResponse>(contents.http_interactions ?? Array.Empty<CachedRequestResponse>());
+                cachedEntries = new List<CachedRequestResponse>(contents.http_interactions ?? Array.Empty<CachedRequestResponse>());
             }
             else
             {
-                cache = new List<CachedRequestResponse>();
+                cachedEntries = new List<CachedRequestResponse>();
             }
+
+            storedEntries = new List<CachedRequestResponse>();
         }
 
         static bool MatchesRequest(CachedRequestResponse cached, HttpRequestMessage request)
@@ -44,15 +47,23 @@ namespace VcrSharp.Tests
 
         internal async Task<CacheResult> FindCachedResponseAsync(HttpRequestMessage request)
         {
-            if (cache == null)
+            if (cachedEntries == null)
             {
                 await SetupCache();
             }
 
-            var match = cache.FirstOrDefault(c => MatchesRequest(c, request));
-            if (match != null)
+            if (currentIndex < 0 || currentIndex >= cachedEntries.Count)
             {
-                return CacheResult.Success(Serializer.Deserialize(match.Response));
+                return CacheResult.Missing();
+            }
+
+            var entry = cachedEntries[currentIndex];
+            currentIndex++;
+            if (MatchesRequest(entry, request))
+            {
+                // persist the existing cached entry to disk
+                storedEntries.Add(entry);
+                return CacheResult.Success(Serializer.Deserialize(entry.Response));
             }
 
             return CacheResult.Missing();
@@ -60,7 +71,7 @@ namespace VcrSharp.Tests
 
         internal async Task StoreCachedResponseAsync(HttpRequestMessage request, HttpResponseMessage freshResponse)
         {
-            if (cache == null)
+            if (cachedEntries == null)
             {
                 await SetupCache();
             }
@@ -71,14 +82,14 @@ namespace VcrSharp.Tests
                 Response = await Serializer.Serialize(freshResponse)
             };
 
-            cache.Add(cachedResponse);
+            storedEntries.Add(cachedResponse);
         }
 
         internal Task FlushToDisk()
         {
             var json = new CachedRequestResponseArray
             {
-                http_interactions = cache.ToArray()
+                http_interactions = storedEntries.ToArray()
             };
 
             var text = JsonConvert.SerializeObject(json);
