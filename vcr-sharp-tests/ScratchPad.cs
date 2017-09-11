@@ -39,7 +39,7 @@ namespace VcrSharp.Tests
         [Fact]
         public async Task WritesAndFlushesAResponseToDisk()
         {
-            Environment.SetEnvironmentVariable("VCR_MODE", "Record");
+            Environment.SetEnvironmentVariable("VCR_MODE", "record");
             var session = "create-local-file";
 
             using (var httpClient = HttpClientFactory.WithCassette(session))
@@ -55,7 +55,7 @@ namespace VcrSharp.Tests
         [Fact]
         public async Task ReplacesExistingRequest()
         {
-            Environment.SetEnvironmentVariable("VCR_MODE", "Cache");
+            Environment.SetEnvironmentVariable("VCR_MODE", "cache");
             var session = "overwrite-request";
 
             var cassette = await ReadCassetteFile(session);
