@@ -53,10 +53,13 @@ namespace VcrSharp.Tests
         }
 
         [Fact]
-        public async Task AppendsNewRequestToCache()
+        public async Task ReplacesExistingRequest()
         {
             Environment.SetEnvironmentVariable("VCR_MODE", "Cache");
-            var session = "append-second-request";
+            var session = "overwrite-request";
+
+            var cassette = await ReadCassetteFile(session);
+            cassette.http_interactions.Length.ShouldBe(1);
 
             using (var httpClient = HttpClientFactory.WithCassette(session))
             {
@@ -64,8 +67,8 @@ namespace VcrSharp.Tests
                 var response = await httpClient.SendAsync(request);
             }
 
-            var cassette = await ReadCassetteFile(session);
-            cassette.http_interactions.Length.ShouldBe(2);
+            cassette = await ReadCassetteFile(session);
+            cassette.http_interactions.Length.ShouldBe(1);
         }
         
         static async Task<CachedRequestResponseArray> ReadCassetteFile(string session)
