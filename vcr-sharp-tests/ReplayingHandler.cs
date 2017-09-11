@@ -35,23 +35,42 @@ namespace VcrSharp.Tests
 
         }
 
+        static VCRMode Parse(string mode)
+        {
+            if (string.IsNullOrWhiteSpace(mode))
+            {
+                return VCRMode.Playback;
+            }
+
+            var text = mode.Trim();
+            if (text.Equals("playback", StringComparison.OrdinalIgnoreCase))
+            {
+                return VCRMode.Playback;
+            }
+
+            if (text.Equals("cache", StringComparison.OrdinalIgnoreCase))
+            {
+                return VCRMode.Cache;
+            }
+
+            if (text.Equals("record", StringComparison.OrdinalIgnoreCase))
+            {
+                return VCRMode.Record;
+            }
+
+            return VCRMode.Playback;
+        }
+
+        VCRMode? _vcrMode;
         VCRMode CurrentVCRMode
         {
             get
             {
-                var mode = Environment.GetEnvironmentVariable("VCR_MODE");
-
-                if (string.IsNullOrWhiteSpace(mode))
+                if (!_vcrMode.HasValue)
                 {
-                    return VCRMode.Playback;
+                    _vcrMode = Parse(Environment.GetEnvironmentVariable("VCR_MODE"));
                 }
-
-                if (Enum.TryParse(mode, out VCRMode result))
-                {
-                    return result;
-                }
-
-                return VCRMode.Playback;
+                return _vcrMode.Value;
             }
         }
 
