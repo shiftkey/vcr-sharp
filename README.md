@@ -52,6 +52,3 @@ a lot of prior art in here which I've used for research as part of starting this
  - [**@philschatz**](https://github.com/philschatz) for his work on [`fetch-vcr`](https://github.com/philschatz/fetch-vcr)
  - [**@mleech**](https://github.com/mleech) for his work on [`scotch`](https://github.com/mleech/scotch)
 
-## TODO
-
- - probably a bunch of other things
